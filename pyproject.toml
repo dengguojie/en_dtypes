@@ -1,0 +1,61 @@
+[project]
+name = "en_dtypes"
+version = "0.0.2"
+description = "Experimental numpy dtypes"
+readme = "README.md"
+requires-python = ">=3.7"
+license = {text = "Appache-2.0"}
+authors = [
+    { name="dengguojie", email="denggj7@163.com"}
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "License :: OSI Approved :: Apache Software License",
+    "Intended Audience :: Science/Research",
+]
+keywords = []
+
+# pip dependencies of the project
+dependencies = [
+    # Ensure numpy release supports Python version.
+    "numpy>1.20",
+]
+
+[project.urls]
+#homepage = ""
+#repository = ""
+# Other: `documentation`, `changelog`
+
+[project.optional-dependencies]
+# Development deps (unittest, linting, formating,...)
+# Installed through `pip install .[dev]`
+dev = [
+    "absl-py",
+    "pytest",
+    "pytest-xdist",
+    "pylint>=2.6.0",
+    "pyink",
+]
+
+[tool.pyink]
+# Formatting configuration to follow Google style-guide
+line-length = 80
+preview = true
+pyink-indentation = 2
+pyink-use-majority-quotes = true
+
+[build-system]
+requires = [
+    "numpy>=3.7",
+    "setuptools",
+]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["en_dtypes"]
+include-package-data = false
+
+[tool.setuptools.package-data]
+en_dtypes = ["py.typed"]
+"en_dtypes.include" = ["*.h"]
