@@ -47,7 +47,7 @@ pyink-use-majority-quotes = true
 
 [build-system]
 requires = [
-    "numpy>=3.7",
+    "numpy>=1.20",
     "setuptools",
 ]
 build-backend = "setuptools.build_meta"
