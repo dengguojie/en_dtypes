@@ -734,6 +734,69 @@ struct numeric_limits<en_dtypes::floatn_internal::float6_e3m2>
 template <>
 struct numeric_limits<en_dtypes::floatn_internal::float8_e8m0>
     : public en_dtypes::floatn_internal::numeric_limits_float8_e8m0 {};
+
+// const
+template <>
+struct numeric_limits<const en_dtypes::floatn_internal::float4_e2m1>
+    : public en_dtypes::floatn_internal::numeric_limits_float4_e2m1 {};
+
+template <>
+struct numeric_limits<const en_dtypes::floatn_internal::float4_e1m2>
+    : public en_dtypes::floatn_internal::numeric_limits_float4_e1m2 {};
+
+template <>
+struct numeric_limits<const en_dtypes::floatn_internal::float6_e2m3>
+    : public en_dtypes::floatn_internal::numeric_limits_float6_e2m3 {};
+
+template <>
+struct numeric_limits<const en_dtypes::floatn_internal::float6_e3m2>
+    : public en_dtypes::floatn_internal::numeric_limits_float6_e3m2 {};
+
+template <>
+struct numeric_limits<const en_dtypes::floatn_internal::float8_e8m0>
+    : public en_dtypes::floatn_internal::numeric_limits_float8_e8m0 {};
+
+// volatile
+template <>
+struct numeric_limits<volatile en_dtypes::floatn_internal::float4_e2m1>
+    : public en_dtypes::floatn_internal::numeric_limits_float4_e2m1 {};
+
+template <>
+struct numeric_limits<volatile en_dtypes::floatn_internal::float4_e1m2>
+    : public en_dtypes::floatn_internal::numeric_limits_float4_e1m2 {};
+
+template <>
+struct numeric_limits<volatile en_dtypes::floatn_internal::float6_e2m3>
+    : public en_dtypes::floatn_internal::numeric_limits_float6_e2m3 {};
+
+template <>
+struct numeric_limits<volatile en_dtypes::floatn_internal::float6_e3m2>
+    : public en_dtypes::floatn_internal::numeric_limits_float6_e3m2 {};
+
+template <>
+struct numeric_limits<volatile en_dtypes::floatn_internal::float8_e8m0>
+    : public en_dtypes::floatn_internal::numeric_limits_float8_e8m0 {};
+
+// const volatile
+template <>
+struct numeric_limits<const volatile en_dtypes::floatn_internal::float4_e2m1>
+    : public en_dtypes::floatn_internal::numeric_limits_float4_e2m1 {};
+
+template <>
+struct numeric_limits<const volatile en_dtypes::floatn_internal::float4_e1m2>
+    : public en_dtypes::floatn_internal::numeric_limits_float4_e1m2 {};
+
+template <>
+struct numeric_limits<const volatile en_dtypes::floatn_internal::float6_e2m3>
+    : public en_dtypes::floatn_internal::numeric_limits_float6_e2m3 {};
+
+template <>
+struct numeric_limits<const volatile en_dtypes::floatn_internal::float6_e3m2>
+    : public en_dtypes::floatn_internal::numeric_limits_float6_e3m2 {};
+
+template <>
+struct numeric_limits<const volatile en_dtypes::floatn_internal::float8_e8m0>
+    : public en_dtypes::floatn_internal::numeric_limits_float8_e8m0 {};
 }  // namespace std
 
 namespace en_dtypes {
@@ -1222,8 +1285,11 @@ struct ConvertImpl</*From=*/float8_e8m0, To, kSaturate, kTruncate,
         static_cast<uint32_t>(static_cast<uint32_t>(1) << 22));
     }
 
-    return std::is_same_v<To, float> ? float_v : \
-           ConvertImpl<float, To, kSaturate, kTruncate>::run(float_v);
+    if constexpr (std::is_same_v<To, float>) {
+      return float_v;
+    } else {
+      return ConvertImpl<float, To, kSaturate, kTruncate>::run(float_v);
+    }
   }
 };
 
@@ -1248,7 +1314,7 @@ struct ConvertImpl<From, /*To=*/float8_e8m0, kSaturate, kTruncate,
 
     const bool from_sign_bit =
         Eigen::numext::bit_cast<FromBits>(from) >> (kFromBits - 1);
-    if (from_sign_bit > 0) {
+    if (from_sign_bit) {
       // negative. return NaN.
       return Eigen::NumTraits<float8_e8m0>::quiet_NaN();
     }
@@ -1263,7 +1329,7 @@ struct ConvertImpl<From, /*To=*/float8_e8m0, kSaturate, kTruncate,
     /*
       When To=float8_e8m0, we convert From -> float -> float8_e8m0
     */
-    if (std::is_same_v<From, float>) {
+    if constexpr (std::is_same_v<From, float>) {
       // 2**-127
       const uint32_t float8_min_bits = static_cast<uint32_t>(static_cast<uint32_t>(1) << 22);
       if (from_bits == float8_min_bits) {
@@ -1373,7 +1439,6 @@ bit_cast<uint8_t, en_dtypes::float8_e8m0>(const en_dtypes::float8_e8m0& src) {
 
 // Work-around for isinf/isnan/isfinite issue on aarch64.
 namespace internal {
-// TODO: test
 template <>
 EIGEN_DEVICE_FUNC inline bool isnan_impl<en_dtypes::float8_e8m0>(
     const en_dtypes::float8_e8m0& x) {
@@ -1390,3 +1455,4 @@ EIGEN_DEVICE_FUNC inline bool isfinite_impl<en_dtypes::float8_e8m0>(
 }  // namespace Eigen
 
 #endif  // EN_DTYPES_FLOATN_H_
+

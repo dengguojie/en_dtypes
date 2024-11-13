@@ -34,6 +34,7 @@ limitations under the License.
 #include "Eigen/Core"
 #include "src/en_float.h"
 #include "include/floatn.h"
+#include "include/hifloat.h"
 
 namespace en_dtypes {
 
@@ -136,6 +137,25 @@ struct TypeDescriptor<float8_e8m0>
   static constexpr char kNpyDescrByteorder = '=';
 };
 
+template <>
+struct TypeDescriptor<hifloat8>
+    : EnFloatType<hifloat8> {
+  typedef hifloat8 T;
+  static constexpr bool is_floating = true;
+  static constexpr bool is_integral = false;
+  static constexpr const char* kTypeName = "hifloat8";
+  static constexpr const char* kQualifiedTypeName = "en_dtypes.hifloat8";
+  static constexpr const char* kTpDoc = "hifloat8 floating-point values";
+  // We must register hifloat8 with a unique kind, because numpy
+  // considers two types with the same kind and size to be equal.
+  // The downside of this is that NumPy scalar promotion does not work with
+  // float8 values.
+  static constexpr char kNpyDescrKind = 'V';
+  // there doesn't seem to be a way of guaranteeing a type character is unique.
+  static constexpr char kNpyDescrType = '7';
+  static constexpr char kNpyDescrByteorder = '=';
+};
+
 namespace {
 
 // Performs a NumPy array cast from type 'From' to 'To' via `Via`.
@@ -212,6 +232,10 @@ bool Initialize() {
     return false;
   }
 
+  if (!RegisterFloatDtype<hifloat8>(numpy.get())) {
+    return false;
+  }
+
   // Register casts between pairs of custom float dtypes.
   bool success = true;
   success &=
@@ -274,7 +298,14 @@ extern "C" EXPORT_SYMBOL PyObject* PyInit__en_dtypes_ext() {
     return nullptr;
   }
 
+  if (PyObject_SetAttrString(m.get(), "hifloat8",
+                            reinterpret_cast<PyObject*>(
+                                TypeDescriptor<hifloat8>::type_ptr)) < 0) {
+    return nullptr;
+  }
+
   return m.release();
 }
 }  // namespace en_dtypes
+
 

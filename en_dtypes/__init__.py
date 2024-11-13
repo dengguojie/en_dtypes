@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__version__ = "0.0.2"  # Keep in sync with pyproject.toml:version
+__version__ = "0.0.3"  # Keep in sync with pyproject.toml:version
 __all__ = [
     "__version__",
     "finfo",
@@ -21,6 +21,7 @@ __all__ = [
     "float6_e2m3",
     "float6_e3m2",
     "float8_e8m0",
+    "hifloat8",
 ]
 
 from typing import Type
@@ -31,6 +32,7 @@ from en_dtypes._en_dtypes_ext import float4_e1m2
 from en_dtypes._en_dtypes_ext import float6_e2m3
 from en_dtypes._en_dtypes_ext import float6_e3m2
 from en_dtypes._en_dtypes_ext import float8_e8m0
+from en_dtypes._en_dtypes_ext import hifloat8
 import numpy as np
 
 float4_e2m1: Type[np.generic]
@@ -41,5 +43,8 @@ float6_e3m2: Type[np.generic]
 
 float8_e8m0: Type[np.generic]
 
+hifloat8: Type[np.generic]
+
 
 del np, Type
+

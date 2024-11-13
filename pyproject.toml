@@ -1,6 +1,6 @@
 [project]
 name = "en_dtypes"
-version = "0.0.2"
+version = "0.0.3"
 description = "Experimental numpy dtypes"
 readme = "README.md"
 requires-python = ">=3.7"

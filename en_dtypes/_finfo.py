@@ -21,6 +21,7 @@ from en_dtypes._en_dtypes_ext import float4_e1m2
 from en_dtypes._en_dtypes_ext import float6_e2m3
 from en_dtypes._en_dtypes_ext import float6_e3m2
 from en_dtypes._en_dtypes_ext import float8_e8m0
+from en_dtypes._en_dtypes_ext import hifloat8
 import numpy as np
 
 _float4_e2m1_dtype = np.dtype(float4_e2m1)
@@ -30,6 +31,8 @@ _float6_e2m3_dtype = np.dtype(float6_e2m3)
 _float6_e3m2_dtype = np.dtype(float6_e3m2)
 
 _float8_e8m0_dtype = np.dtype(float8_e8m0)
+
+_hifloat8_type = np.dtype(hifloat8)
 
 
 class _Float4E2m1MachArLike:
@@ -75,6 +78,15 @@ class _Float8E8m0MachArLike:
     self.smallest_normal = float8_e8m0(smallest_normal)
     smallest_subnormal = float.fromhex("0x1p-127")  # 2^-127, actually no subnormal
     self.smallest_subnormal = float8_e8m0(smallest_subnormal)
+
+
+class _HiFloat8MachArLike:
+
+  def __init__(self):
+    smallest_normal = float.fromhex("0x1.8p-15")  # 2^(-15)*(1+0.5)
+    self.smallest_normal = hifloat8(smallest_normal)
+    smallest_subnormal = float.fromhex("0x1p-22")  # 2^-22
+    self.smallest_subnormal = hifloat8(smallest_subnormal)
 
 
 class finfo(np.finfo):  # pylint: disable=invalid-name,missing-class-docstring
@@ -267,7 +279,7 @@ class finfo(np.finfo):  # pylint: disable=invalid-name,missing-class-docstring
       return "%6.2e" % float(f)
 
     tiny = float.fromhex("0x1p-127")  # smallest_normal = 2^-127
-    resolution = 1  # 10**(-precision) TODO
+    resolution = 1  # 10**(-precision)
     eps = float.fromhex("0x1p0")  # 1.0
     epsneg = float.fromhex("0x1p-1")  # 0.5
     max_ = float.fromhex("0x1.p127")  # 2 ^ 127
@@ -306,6 +318,51 @@ class finfo(np.finfo):  # pylint: disable=invalid-name,missing-class-docstring
     # pylint: enable=protected-access
     return obj
 
+  @staticmethod
+  def _hifloat8_finfo():
+    def float_to_str(f):
+      return "%6.2e" % float(f)
+
+    tiny = float.fromhex("0x1.8p-15")  # smallest_normal = 2^(-15)*(1+0.5)
+    resolution = 1  # 10**(-precision)
+    eps = float.fromhex("0x1p-3")  # 0.125
+    epsneg = float.fromhex("0x1p-4")  # 0.0625
+    max_ = float.fromhex("0x1.p15")  # 2 ^ 15
+
+    obj = object.__new__(np.finfo)
+    obj.dtype = _hifloat8_type
+    obj.bits = 8
+    obj.eps = hifloat8(eps)
+    obj.epsneg = hifloat8(epsneg)
+    obj.machep = -3  # np.log10(eps) / np.log10(2)
+    obj.negep = -4  # np.log10(epsneg) / np.log10(2)
+    obj.max = hifloat8(max_)
+    obj.min = hifloat8(-max_)
+    obj.nexp = 3  # actually this is dynamic ...
+    obj.nmant = 3  # actually this is dynamic ...
+    obj.iexp = obj.nexp
+    obj.maxexp = 15
+    obj.minexp = -22
+    obj.precision = 0  # int(-log10(eps))
+    obj.resolution = hifloat8(resolution)
+    # pylint: disable=protected-access
+    obj._machar = _HiFloat8MachArLike()
+    if not hasattr(obj, "tiny"):
+      obj.tiny = hifloat8(tiny)
+    if not hasattr(obj, "smallest_normal"):
+      obj.smallest_normal = obj._machar.smallest_normal
+    obj.smallest_subnormal = obj._machar.smallest_subnormal
+
+    obj._str_tiny = float_to_str(tiny)
+    obj._str_smallest_normal = float_to_str(tiny)
+    obj._str_smallest_subnormal = float_to_str(obj.smallest_subnormal)
+    obj._str_max = float_to_str(max_)
+    obj._str_epsneg = float_to_str(epsneg)
+    obj._str_eps = float_to_str(eps)
+    obj._str_resolution = float_to_str(resolution)
+    # pylint: enable=protected-access
+    return obj
+
   def __new__(cls, dtype):
     if (isinstance(dtype, str) and dtype == "float4_e2m1" or dtype == _float4_e2m1_dtype):
       if _float4_e2m1_dtype not in cls._finfo_cache:
@@ -327,4 +384,9 @@ class finfo(np.finfo):  # pylint: disable=invalid-name,missing-class-docstring
       if _float8_e8m0_dtype not in cls._finfo_cache:
         cls._finfo_cache[_float8_e8m0_dtype] = cls._float8_e8m0_finfo()
       return cls._finfo_cache[_float8_e8m0_dtype]
+    if (isinstance(dtype, str) and dtype == "hifloat8" or dtype == _hifloat8_type):
+      if _hifloat8_type not in cls._finfo_cache:
+        cls._finfo_cache[_hifloat8_type] = cls._hifloat8_finfo()
+      return cls._finfo_cache[_hifloat8_type]
     return super().__new__(cls, dtype)
+
