@@ -83,7 +83,7 @@ class _Float8E8m0MachArLike:
 class _HiFloat8MachArLike:
 
   def __init__(self):
-    smallest_normal = float.fromhex("0x1.8p-15")  # 2^(-15)*(1+0.5)
+    smallest_normal = float.fromhex("0x1p-15")  # 2^(-15)*(1 + 0.5 * 0)
     self.smallest_normal = hifloat8(smallest_normal)
     smallest_subnormal = float.fromhex("0x1p-22")  # 2^-22
     self.smallest_subnormal = hifloat8(smallest_subnormal)
@@ -323,7 +323,7 @@ class finfo(np.finfo):  # pylint: disable=invalid-name,missing-class-docstring
     def float_to_str(f):
       return "%6.2e" % float(f)
 
-    tiny = float.fromhex("0x1.8p-15")  # smallest_normal = 2^(-15)*(1+0.5)
+    tiny = float.fromhex("0x1p-15")  # smallest_normal = 2^(-15)*(1+0.5*0)
     resolution = 1  # 10**(-precision)
     eps = float.fromhex("0x1p-3")  # 0.125
     epsneg = float.fromhex("0x1p-4")  # 0.0625

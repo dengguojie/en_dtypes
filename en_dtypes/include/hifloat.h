@@ -362,9 +362,9 @@ struct numeric_limits_hifloat8 {
       MaxExponent10FromMaxExponentAndDigits(max_exponent, digits);
   // NOLINTEND
 
-  // 0b0'11'1111'1 = 2 ^ (-15) * (1 + 2 ^ (-1) * 1)
+  // 0b0'11'1111'0 = 2 ^ (-15) (min normal)
   static constexpr hifloat8 min() {
-    return hifloat8::FromRep(0b0'11'1111'1);
+    return hifloat8::FromRep(0b0'11'1111'0);
   }
   // 0b1'11'0111'0 = -32768
   static constexpr hifloat8 lowest() {
@@ -394,7 +394,7 @@ struct numeric_limits_hifloat8 {
   static constexpr hifloat8 signaling_NaN() {
     return hifloat8::FromRep(0b1'0000'000);
   }
-  // 0b0'0000'001 = 2^-22
+  // 0b0'0000'001 = 2^-22  (min denormal)
   static constexpr hifloat8 denorm_min() {
     return hifloat8::FromRep(0b0'0000'001);
   }

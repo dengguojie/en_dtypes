@@ -442,7 +442,7 @@ struct numeric_limits_float4_e2m1 : public numeric_limits_floatn_base {
       MaxExponent10FromMaxExponentAndDigits(max_exponent, digits);
   // NOLINTEND
 
-  // 1.0 * 2^(0b01 - 1) = 1.0 * 2^0 = 1.0
+  // 1.0 * 2^(0b01 - 1) = 1.0 * 2^0 = 1.0 (min normal)
   static constexpr float4_e2m1 min() {
     return float4_e2m1::FromRep(0b0'01 << kMantissaBits);
   }
@@ -472,7 +472,7 @@ struct numeric_limits_float4_e2m1 : public numeric_limits_floatn_base {
   static constexpr float4_e2m1 signaling_NaN() {
     return float4_e2m1::FromRep(0b0'00'0);
   }
-  // 0.5
+  // 0.5  (min denormal)
   static constexpr float4_e2m1 denorm_min() {
     return float4_e2m1::FromRep(0b0'00'1);
   }
@@ -498,7 +498,7 @@ struct numeric_limits_float4_e1m2 : public numeric_limits_floatn_base {
       MaxExponent10FromMaxExponentAndDigits(max_exponent, digits);
   // NOLINTEND
 
-  // 1.0 * 2^(0b1 - 1) = 1.0 * 2^0 = 1.0
+  // 1.0 * 2^(0b1 - 1) = 1.0 * 2^0 = 1.0 (min normal)
   static constexpr float4_e1m2 min() {
     return float4_e1m2::FromRep(0b0'1 << kMantissaBits);
   }
@@ -528,7 +528,7 @@ struct numeric_limits_float4_e1m2 : public numeric_limits_floatn_base {
   static constexpr float4_e1m2 signaling_NaN() {
     return float4_e1m2::FromRep(0b0'0'00);
   }
-  // 0.25
+  // 0.25  (min denormal)
   static constexpr float4_e1m2 denorm_min() {
     return float4_e1m2::FromRep(0b0'0'01);
   }
@@ -554,7 +554,7 @@ struct numeric_limits_float6_e2m3 : public numeric_limits_floatn_base {
       MaxExponent10FromMaxExponentAndDigits(max_exponent, digits);
   // NOLINTEND
 
-  // 1.0 * 2^(0b01 - 1) = 1.0 * 2^0 = 1.0
+  // 1.0 * 2^(0b01 - 1) = 1.0 * 2^0 = 1.0 (min normal)
   static constexpr float6_e2m3 min() {
     return float6_e2m3::FromRep(0b0'01 << kMantissaBits);
   }
@@ -584,7 +584,7 @@ struct numeric_limits_float6_e2m3 : public numeric_limits_floatn_base {
   static constexpr float6_e2m3 signaling_NaN() {
     return float6_e2m3::FromRep(0b0'00'000);
   }
-  // 0.125
+  // 0.125  (min denormal)
   static constexpr float6_e2m3 denorm_min() {
     return float6_e2m3::FromRep(0b0'00'001);
   }
@@ -610,7 +610,7 @@ struct numeric_limits_float6_e3m2 : public numeric_limits_floatn_base {
       MaxExponent10FromMaxExponentAndDigits(max_exponent, digits);
   // NOLINTEND
 
-  // 1.0 * 2^(0b001 - 3) = 1.0 * 2^-2 = 0.25
+  // 1.0 * 2^(0b001 - 3) = 1.0 * 2^-2 = 0.25 (min normal)
   static constexpr float6_e3m2 min() {
     return float6_e3m2::FromRep(0b0'001 << kMantissaBits);
   }
@@ -640,7 +640,7 @@ struct numeric_limits_float6_e3m2 : public numeric_limits_floatn_base {
   static constexpr float6_e3m2 signaling_NaN() {
     return float6_e3m2::FromRep(0b0'000'00);
   }
-  // 0.0625
+  // 0.0625 (min denormal)
   static constexpr float6_e3m2 denorm_min() {
     return float6_e3m2::FromRep(0b0'000'01);
   }
@@ -670,7 +670,7 @@ struct numeric_limits_float8_e8m0 : public numeric_limits_floatn_base {
       static_cast<int>(ConstexprFloor(max_exponent * kLog10Of2));
   // NOLINTEND
 
-  // 2**(0b0000'0000 - 127) = 2^-127
+  // 2**(0b0000'0000 - 127) = 2^-127 (min normal)
   static constexpr float8_e8m0 min() {
     return float8_e8m0::FromRep(0b0000'0000);
   }
@@ -704,7 +704,7 @@ struct numeric_limits_float8_e8m0 : public numeric_limits_floatn_base {
   static constexpr float8_e8m0 signaling_NaN() {
     return float8_e8m0::FromRep(0b1111'1111);
   }
-  // no use, since has_denormal is absent
+  // no use, since has_denormal is absent  (min denormal)
   static constexpr float8_e8m0 denorm_min() {
     return float8_e8m0::FromRep(0b0000'0000);
   }
@@ -901,11 +901,10 @@ struct Traits : public TraitsBase<Float> {};
 template <>
 struct Traits<float4_e2m1> : public TraitsBase<float4_e2m1> {
   using Base = TraitsBase<float4_e2m1>;
-  static constexpr int kBits = 4;
   static constexpr int kExponentBits = 2;
   static constexpr Base::BitsType kExponentMask = ((Base::BitsType{1} << kExponentBits) - 1)
                                                   << Base::kMantissaBits;
-  static constexpr Base::BitsType kSignMask = Base::BitsType{1} << (kBits - 1);
+  static constexpr Base::BitsType kSignMask = Base::BitsType{1} << (4 - 1);
   static constexpr Base::BitsType kMantissaMask = (Base::BitsType{1} << Base::kMantissaBits) - 1;
   static constexpr int kExponentBias = 1;
 };
@@ -913,11 +912,10 @@ struct Traits<float4_e2m1> : public TraitsBase<float4_e2m1> {
 template <>
 struct Traits<float4_e1m2> : public TraitsBase<float4_e1m2> {
   using Base = TraitsBase<float4_e1m2>;
-  static constexpr int kBits = 4;
   static constexpr int kExponentBits = 1;
   static constexpr Base::BitsType kExponentMask = ((Base::BitsType{1} << kExponentBits) - 1)
                                                   << Base::kMantissaBits;
-  static constexpr Base::BitsType kSignMask = Base::BitsType{1} << (kBits - 1);
+  static constexpr Base::BitsType kSignMask = Base::BitsType{1} << (4 - 1);
   static constexpr Base::BitsType kMantissaMask = (Base::BitsType{1} << Base::kMantissaBits) - 1;
   static constexpr int kExponentBias = 1;
 };
@@ -925,11 +923,10 @@ struct Traits<float4_e1m2> : public TraitsBase<float4_e1m2> {
 template <>
 struct Traits<float6_e2m3> : public TraitsBase<float6_e2m3> {
   using Base = TraitsBase<float6_e2m3>;
-  static constexpr int kBits = 6;
   static constexpr int kExponentBits = 2;
   static constexpr Base::BitsType kExponentMask = ((Base::BitsType{1} << kExponentBits) - 1)
                                                   << Base::kMantissaBits;
-  static constexpr Base::BitsType kSignMask = Base::BitsType{1} << (kBits - 1);
+  static constexpr Base::BitsType kSignMask = Base::BitsType{1} << (6 - 1);
   static constexpr Base::BitsType kMantissaMask = (Base::BitsType{1} << Base::kMantissaBits) - 1;
   static constexpr int kExponentBias = 1;
 };
@@ -937,11 +934,10 @@ struct Traits<float6_e2m3> : public TraitsBase<float6_e2m3> {
 template <>
 struct Traits<float6_e3m2> : public TraitsBase<float6_e3m2> {
   using Base = TraitsBase<float6_e3m2>;
-  static constexpr int kBits = 6;
   static constexpr int kExponentBits = 3;
   static constexpr Base::BitsType kExponentMask = ((Base::BitsType{1} << kExponentBits) - 1)
                                                   << Base::kMantissaBits;
-  static constexpr Base::BitsType kSignMask = Base::BitsType{1} << (kBits - 1);
+  static constexpr Base::BitsType kSignMask = Base::BitsType{1} << (6 - 1);
   static constexpr Base::BitsType kMantissaMask = (Base::BitsType{1} << Base::kMantissaBits) - 1;
   static constexpr int kExponentBias = 3;
 };
@@ -949,7 +945,6 @@ struct Traits<float6_e3m2> : public TraitsBase<float6_e3m2> {
 template <>
 struct Traits<float8_e8m0> : public TraitsBase<float8_e8m0> {
   using Base = TraitsBase<float8_e8m0>;
-  static constexpr int kBits = 8;
   static constexpr int kExponentBits = 8;
   static constexpr Base::BitsType kExponentMask = (Base::BitsType{1} << kExponentBits) - 1;
   static constexpr Base::BitsType kSignMask = Base::BitsType{0};
@@ -1045,10 +1040,10 @@ struct ConvertImpl<From, To, kSaturate, kTruncate,
   static constexpr int kFromExponentBits = FromTraits::kExponentBits;
   static constexpr int kFromExponentBias = FromTraits::kExponentBias;
   static constexpr FromBits kFromExponentMask = FromTraits::kExponentMask;
+  static constexpr FromBits kFromSignMask = FromTraits::kSignMask;
 
   using ToTraits = Traits<To>;
   using ToBits = typename ToTraits::BitsType;
-  static constexpr int kToBits = ToTraits::kBits;
   static constexpr int kToMantissaBits = ToTraits::kMantissaBits;
   static constexpr int kToExponentBits = ToTraits::kExponentBits;
   static constexpr int kToExponentBias = ToTraits::kExponentBias;
@@ -1067,7 +1062,7 @@ struct ConvertImpl<From, To, kSaturate, kTruncate,
   static EIGEN_DEVICE_FUNC inline To run(From from) {
     // Shift bits to destination type, without sign bit.
     const bool from_sign_bit =
-        Eigen::numext::bit_cast<FromBits>(from) >> (kFromBits - 1);
+        Eigen::numext::bit_cast<FromBits>(from) & kFromSignMask;
     const FromBits from_bits =
         Eigen::numext::bit_cast<FromBits>(Eigen::numext::abs(from));
 
