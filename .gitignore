@@ -27,3 +27,6 @@ poetry.lock
 
 # pipenv
 Pipfile
+
+# wheelhouse files
+wheelhouse/
